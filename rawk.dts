@@ -1,0 +1,52 @@
+/*
+ * SPDX-FileCopyrightText: © 2022 James Reynolds
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+/dts-v1/;
+
+/ {
+        #address-cells = <2>;
+        #size-cells = <2>;
+
+        model = "rawk";
+        compatible = "rawk,rawk";
+
+        chosen {
+               bootargs = "loglevel=8 earlycon=uart8250,mmio,0x1000000,115200n8 keep_bootcon";
+        };
+
+        cpus {
+                #address-cells = <1>;
+                #size-cells = <0>;
+                timebase-frequency = <0x100000>;
+                cpu0: cpu@0 {
+                        compatible = "riscv";
+                        device_type = "cpu";
+                        reg = <0>;
+                        riscv,isa = "rv64ima";
+                        cpu0_intc: interrupt-controller {
+                                #interrupt-cells = <1>;
+                                compatible = "riscv,cpu-intc";
+                                interrupt-controller;
+                        };
+                };
+        };
+
+        memory@80000000 {
+               device_type = "memory";
+               reg = <0x0 0x80000000 0x0 0x1000000>;
+        };
+
+        soc {
+            #address-cells = <2>;
+            #size-cells = <2>;
+            ranges;
+
+            clint: clint@2000000{
+                   compatible = "riscv,clint0";
+                   reg = <0x0 0x2000000 0x0 0x10000>;
+                   interrupts-extended = <&cpu0_intc 3 &cpu0_intc 7>;
+            };
+        };
+};
